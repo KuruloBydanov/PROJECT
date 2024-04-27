@@ -22,9 +22,8 @@ lw_files = QListWidget()
 btn_left = QPushButton("START")
 btn_right = QPushButton("STOP")
 btn_flip = QPushButton("NEXT")
-btn_sharp = QPushButton("Різкість")
-btn_bw = QPushButton("Ч/Б")
- 
+btn_bw = QPushButton("PREVIOUS")
+
 row = QHBoxLayout()          # Головна лінія
 col1 = QVBoxLayout()         # ділиться на два стовпці
 col2 = QVBoxLayout()
@@ -36,7 +35,6 @@ row_tools.addWidget(btn_left)
 row_tools.addWidget(btn_left)
 row_tools.addWidget(btn_right)
 row_tools.addWidget(btn_flip)
-row_tools.addWidget(btn_sharp)
 row_tools.addWidget(btn_bw)
 col2.addLayout(row_tools)
  
@@ -54,6 +52,7 @@ padding: 5px;
 } 
 
 ''')
+
 
 win.show()
  
@@ -81,14 +80,6 @@ def pause_button_pressed():
 #Connect button clicks to functions
 btn_left.clicked.connect(start_button_pressed)  # Assuming "btn_left" is the start button
 btn_right.clicked.connect(pause_button_pressed)  # Assuming "btn_right" is the pause button
-
-
-
-
-
-
-
-
 
 
 
@@ -143,10 +134,61 @@ def playChosenMus():
     if lw_files.currentRow() >= 0:
         filename = lw_files.currentItem().text()
         musico.loadMusic(workdir, filename)
-        musico.playMusic(filename)
+        # musico.playMusic(filename)
         # image_path = os.path.join(workimage.dir, workimage.filename)
         # workimage.showImage(image_path)
 
 lw_files.currentRowChanged.connect(playChosenMus)
+
+
+
+
+def next_song():
+ 
+  current_row = lw_files.currentRow()
+
+  # Check if a song is selected and not the last one
+  if current_row >= 0 and current_row < lw_files.count() - 1:
+    # Stop the current song
+    pygame.mixer.music.stop()
+
+    # Select the next song (wrapping around if needed)
+    next_row = (current_row + 1) % lw_files.count()
+    lw_files.setCurrentRow(next_row)
+
+    # Get the filename of the next song
+    next_filename = lw_files.currentItem().text()
+
+    # Load and play the next song
+    musico.loadMusic(workdir, next_filename)
+    musico.playMusic(next_filename)
+
+
+btn_flip.clicked.connect(next_song)
+
+
+
+
+def previous_song():
+ 
+  current_row = lw_files.currentRow()
+
+  # Check if a song is selected and not the first one
+  if current_row >= 0 and current_row > 0:
+    # Stop the current song
+    pygame.mixer.music.stop()
+
+    # Select the previous song (wrapping around if needed)
+    previous_row = (current_row - 1) % lw_files.count()
+    lw_files.setCurrentRow(previous_row)
+
+    # Get the filename of the previous song
+    previous_filename = lw_files.currentItem().text()
+
+    # Load and play the previous song
+    musico.loadMusic(workdir, previous_filename)
+    musico.playMusic(previous_filename)
+
+btn_bw.clicked.connect(previous_song)
 
 app.exec()
